@@ -1,0 +1,11 @@
+name = "idea-box"
+main = "src/worker.js"
+compatibility_date = "2024-10-31"
+compatibility_flags = ["nodejs_compat"]
+
+[site]
+bucket = "./dist"
+
+[[r2_buckets]]
+binding = "IDEA_BOX_STORAGE"
+bucket_name = "idea-box"
