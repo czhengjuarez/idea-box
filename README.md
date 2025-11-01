@@ -13,7 +13,6 @@ A modern web application for team members to submit, prioritize, and track impro
 - **Tab Navigation**: Separate views for "Suggestions" and "Tracked" ideas
 - **R2 Storage**: All ideas are stored in Cloudflare R2 and shared across all users
 - **Real-time Sync**: Changes are automatically saved and visible to all team members
-- **Modern UI**: Beautiful, responsive design with Tailwind CSS and custom icons
 
 ## Getting Started
 
@@ -98,11 +97,17 @@ For detailed R2 setup instructions, see [R2_SETUP.md](./R2_SETUP.md).
    - Proposed Solution
    - Potential Impact
 
-2. **Prioritize Ideas**: Drag ideas up or down using the grip handle to reorder them by priority
+2. **Vote on Ideas**: Click the thumbs-up button to upvote ideas you support
 
-3. **Create Tickets**: Click the "Create Ticket" button on prioritized ideas to mark them for implementation
+3. **Prioritize Ideas**: Drag ideas up or down using the grip handle to reorder them by priority
 
-4. **Delete Ideas**: Remove ideas that are no longer relevant using the delete button
+4. **Create Tickets**: Click the "Create Ticket" button on prioritized ideas to open Jira and mark them as tracked
+
+5. **View Tracked Ideas**: Switch to the "Tracked" tab to see ideas that have been converted to tickets
+
+6. **Edit or Delete**: Use the edit button to modify ideas or delete button to remove them
+
+All changes are automatically saved to R2 storage and synced across all users in real-time.
 
 ## Tech Stack
 
