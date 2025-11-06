@@ -210,6 +210,23 @@ function App() {
     }
   }, [showForm])
 
+  // Reload ideas when returning from manage page
+  useEffect(() => {
+    if (currentPage === 'main') {
+      try {
+        const storedIdeas = localStorage.getItem('ideaBoxIdeas')
+        if (storedIdeas) {
+          const parsedIdeas = JSON.parse(storedIdeas)
+          if (Array.isArray(parsedIdeas)) {
+            setIdeas(parsedIdeas)
+          }
+        }
+      } catch (err) {
+        console.error('Error loading ideas from localStorage:', err)
+      }
+    }
+  }, [currentPage])
+
   // LOCAL DEV: Load ideas from localStorage on mount
   useEffect(() => {
     try {
