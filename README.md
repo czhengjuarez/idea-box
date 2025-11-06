@@ -17,7 +17,7 @@ A modern web application for team members to submit, prioritize, and track impro
 
 ### Admin Management
 - **Secure Admin Portal**: Access management features via Settings icon (⚙️)
-  - Login: `admin@ideabox.com` / `admin123`
+  - Login: `pxlt@cloudflare.com` / `pxlt2025`
 - **Edit Ideas**: Admin can edit any submitted idea
 - **Create Tickets**: Mark prioritized ideas as tickets and open Jira for tracking (admin-only)
 - **Delete Ideas**: Remove ideas from the system
@@ -145,7 +145,7 @@ For detailed R2 setup instructions, see [R2_SETUP.md](./R2_SETUP.md).
 
 1. **Access Admin Portal**: Click the Settings icon (⚙️) in the top right corner
 
-2. **Login**: Use credentials `admin@ideabox.com` / `admin123`
+2. **Login**: Use credentials `pxlt@cloudflare.com` / `pxlt2025`
 
 3. **Manage Ideas**: In the admin portal you can:
    - View all submitted ideas with full name visibility

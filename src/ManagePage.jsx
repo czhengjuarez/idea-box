@@ -38,7 +38,7 @@ function LoginForm({ onLogin }) {
     
     // Simple hardcoded credentials for MVP
     // TODO: Replace with proper authentication
-    if (email === 'admin@ideabox.com' && password === 'admin123') {
+    if (email === 'pxlt@cloudflare.com' && password === 'pxlt2025') {
       onLogin()
       setError('')
     } else {
@@ -63,7 +63,7 @@ function LoginForm({ onLogin }) {
               onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="admin@ideabox.com"
+              placeholder="pxlt@cloudflare.com"
             />
           </div>
 
@@ -104,12 +104,6 @@ function LoginForm({ onLogin }) {
           </button>
         </form>
 
-        <div className="mt-6 pt-6 border-t border-gray-200">
-          <p className="text-sm text-gray-600 text-center">
-            Demo credentials:<br />
-            <span className="font-mono text-xs">admin@ideabox.com / admin123</span>
-          </p>
-        </div>
       </div>
     </div>
   )
