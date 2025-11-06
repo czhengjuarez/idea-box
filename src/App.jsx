@@ -66,7 +66,7 @@ function getDisplayName(idea, isAdmin = false) {
 }
 
 // Sortable Idea Card Component
-function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
+function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
   const {
     attributes,
     listeners,
@@ -161,18 +161,6 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
 
       {/* Buttons at bottom */}
       <div className="flex gap-2 px-6 pb-6 pt-3 border-t border-gray-100 flex-wrap">
-        {idea.status !== 'ticket' && (
-          <button
-            onClick={() => {
-              window.open('https://jira.cfdata.org/browse/DES-12825', '_blank', 'noopener,noreferrer')
-              onCreateTicket(idea.id)
-            }}
-            className="flex items-center gap-1 px-3 py-1.5 border border-[#0051C3] text-[#0051C3] bg-white rounded hover:bg-blue-50 transition-colors text-sm"
-          >
-            <CheckCircle size={16} />
-            Create Ticket
-          </button>
-        )}
         <button
           onClick={() => onEdit(idea.id)}
           className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
@@ -295,12 +283,6 @@ function App() {
 
   const handleDelete = (id) => {
     setIdeas(ideas.filter((idea) => idea.id !== id))
-  }
-
-  const handleCreateTicket = (id) => {
-    setIdeas(ideas.map((idea) => 
-      idea.id === id ? { ...idea, status: 'ticket' } : idea
-    ))
   }
 
   const handleEdit = (id) => {
@@ -570,7 +552,6 @@ function App() {
                       key={idea.id}
                       idea={idea}
                       onDelete={handleDelete}
-                      onCreateTicket={handleCreateTicket}
                       onEdit={handleEdit}
                       onVote={handleVote}
                     />
