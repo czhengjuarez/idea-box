@@ -34,6 +34,26 @@ function LightbulbIcon({ size = 20, className = '' }) {
   )
 }
 
+// Helper function to get display name based on visibility settings
+function getDisplayName(idea) {
+  if (!idea.submittedBy) return null
+  
+  const visibility = idea.nameVisibility || 'everyone'
+  
+  switch (visibility) {
+    case 'everyone':
+      return idea.submittedBy
+    case 'pxlt':
+      return `${idea.submittedBy} (visible to PXLT only)`
+    case 'ops':
+      return `${idea.submittedBy} (visible to Ops only)`
+    case 'anonymous':
+      return null
+    default:
+      return idea.submittedBy
+  }
+}
+
 // Sortable Idea Card Component
 function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
   const {
@@ -103,9 +123,9 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg text-gray-800">{idea.title}</h3>
           
-          {idea.submittedBy && (
+          {getDisplayName(idea) && (
             <p className="text-sm text-gray-600">
-              <span className="font-medium">Submitted by:</span> {idea.submittedBy}
+              <span className="font-medium">Submitted by:</span> {getDisplayName(idea)}
             </p>
           )}
           
@@ -170,6 +190,7 @@ function App() {
   const [formData, setFormData] = useState({
     title: '',
     submittedBy: '',
+    nameVisibility: 'everyone', // 'everyone', 'pxlt', 'ops', 'anonymous'
     problem: '',
     solution: '',
     impact: '',
@@ -252,6 +273,7 @@ function App() {
     setFormData({
       title: '',
       submittedBy: '',
+      nameVisibility: 'everyone',
       problem: '',
       solution: '',
       impact: '',
@@ -275,6 +297,7 @@ function App() {
       setFormData({
         title: ideaToEdit.title,
         submittedBy: ideaToEdit.submittedBy,
+        nameVisibility: ideaToEdit.nameVisibility || 'everyone',
         problem: ideaToEdit.problem,
         solution: ideaToEdit.solution,
         impact: ideaToEdit.impact,
@@ -333,6 +356,7 @@ function App() {
                   setFormData({
                     title: '',
                     submittedBy: '',
+                    nameVisibility: 'everyone',
                     problem: '',
                     solution: '',
                     impact: '',
@@ -372,6 +396,23 @@ function App() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Your name (optional)"
                 />
+                
+                <div className="mt-2">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Who can see your name?
+                  </label>
+                  <select
+                    name="nameVisibility"
+                    value={formData.nameVisibility}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="everyone">Everyone can see my name</option>
+                    <option value="pxlt">Only PXLT can see my name</option>
+                    <option value="ops">Only Ops can see my name</option>
+                    <option value="anonymous">Submit anonymously (no name shown)</option>
+                  </select>
+                </div>
               </div>
 
               <div>
