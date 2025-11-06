@@ -103,9 +103,11 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg text-gray-800">{idea.title}</h3>
           
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Submitted by:</span> {idea.submittedBy}
-          </p>
+          {idea.submittedBy && (
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Submitted by:</span> {idea.submittedBy}
+            </p>
+          )}
           
           <div className="flex flex-col gap-2 text-sm">
             <div>
@@ -353,16 +355,15 @@ function App() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name *
+                  Your Name <span className="text-gray-400 text-xs">(optional)</span>
                 </label>
                 <input
                   type="text"
                   name="submittedBy"
                   value={formData.submittedBy}
                   onChange={handleInputChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Your name"
+                  placeholder="Your name (optional)"
                 />
               </div>
 
