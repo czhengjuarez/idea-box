@@ -1,6 +1,40 @@
 import { useState, useEffect } from 'react'
 import { Eye, EyeOff, ArrowLeft, Trash2, CheckCircle, Pencil, X, Plus } from 'lucide-react'
 
+// Component to render formatted text with preserved line breaks and bullet points
+function FormattedText({ text }) {
+  if (!text) return null
+  
+  return (
+    <div className="whitespace-pre-wrap">
+      {text.split('\n').map((line, index) => {
+        // Check if line starts with bullet point markers
+        const trimmedLine = line.trim()
+        if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ') || trimmedLine.startsWith('* ')) {
+          return (
+            <div key={index} className="flex gap-2 ml-4">
+              <span>•</span>
+              <span>{trimmedLine.substring(2)}</span>
+            </div>
+          )
+        }
+        // Check for numbered lists
+        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.*)/)
+        if (numberedMatch) {
+          return (
+            <div key={index} className="flex gap-2 ml-4">
+              <span>{numberedMatch[1]}.</span>
+              <span>{numberedMatch[2]}</span>
+            </div>
+          )
+        }
+        // Regular line
+        return <div key={index}>{line || '\u00A0'}</div>
+      })}
+    </div>
+  )
+}
+
 // Helper function to get display name (same as App.jsx but always in admin mode)
 function getDisplayName(idea) {
   if (!idea.submittedBy) return 'No name provided'
@@ -395,15 +429,21 @@ function ManagePage({ onBack }) {
                 <div className="space-y-3 text-sm mb-4">
                   <div>
                     <span className="font-medium text-gray-700">Problem:</span>
-                    <p className="text-gray-600 mt-1">{idea.problem}</p>
+                    <div className="text-gray-600 mt-1">
+                      <FormattedText text={idea.problem} />
+                    </div>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Proposed Solution:</span>
-                    <p className="text-gray-600 mt-1">{idea.solution}</p>
+                    <div className="text-gray-600 mt-1">
+                      <FormattedText text={idea.solution} />
+                    </div>
                   </div>
                   <div>
                     <span className="font-medium text-gray-700">Potential Impact:</span>
-                    <p className="text-gray-600 mt-1">{idea.impact}</p>
+                    <div className="text-gray-600 mt-1">
+                      <FormattedText text={idea.impact} />
+                    </div>
                   </div>
                 </div>
 

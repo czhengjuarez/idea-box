@@ -35,6 +35,40 @@ function LightbulbIcon({ size = 20, className = '' }) {
   )
 }
 
+// Component to render formatted text with preserved line breaks and bullet points
+function FormattedText({ text }) {
+  if (!text) return null
+  
+  return (
+    <div className="whitespace-pre-wrap">
+      {text.split('\n').map((line, index) => {
+        // Check if line starts with bullet point markers
+        const trimmedLine = line.trim()
+        if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ') || trimmedLine.startsWith('* ')) {
+          return (
+            <div key={index} className="flex gap-2 ml-4">
+              <span>•</span>
+              <span>{trimmedLine.substring(2)}</span>
+            </div>
+          )
+        }
+        // Check for numbered lists
+        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.*)/)
+        if (numberedMatch) {
+          return (
+            <div key={index} className="flex gap-2 ml-4">
+              <span>{numberedMatch[1]}.</span>
+              <span>{numberedMatch[2]}</span>
+            </div>
+          )
+        }
+        // Regular line
+        return <div key={index}>{line || '\u00A0'}</div>
+      })}
+    </div>
+  )
+}
+
 // Helper function to get display name based on visibility settings
 // isAdmin: true when viewing from manage page, false for public page
 function getDisplayName(idea, isAdmin = false) {
@@ -143,17 +177,23 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
           <div className="flex flex-col gap-2 text-sm">
             <div>
               <span className="font-medium text-gray-700">Problem:</span>
-              <p className="text-gray-600 mt-1">{idea.problem}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.problem} />
+              </div>
             </div>
             
             <div>
               <span className="font-medium text-gray-700">Proposed Solution:</span>
-              <p className="text-gray-600 mt-1">{idea.solution}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.solution} />
+              </div>
             </div>
             
             <div>
               <span className="font-medium text-gray-700">Potential Impact:</span>
-              <p className="text-gray-600 mt-1">{idea.impact}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.impact} />
+              </div>
             </div>
           </div>
         </div>
@@ -449,9 +489,9 @@ function App() {
                   value={formData.problem}
                   onChange={handleInputChange}
                   required
-                  rows="3"
+                  rows="4"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What problem does this address?"
+                  placeholder="What problem does this address?&#10;&#10;Tip: Use bullet points with - or • for lists&#10;Example:&#10;- Point 1&#10;- Point 2"
                 />
               </div>
 
@@ -464,9 +504,9 @@ function App() {
                   value={formData.solution}
                   onChange={handleInputChange}
                   required
-                  rows="3"
+                  rows="4"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="How would you solve this?"
+                  placeholder="How would you solve this?&#10;&#10;You can use:&#10;- Bullet points (-, •, *)&#10;- Numbered lists (1. 2. 3.)&#10;- Line breaks for paragraphs"
                 />
               </div>
 
@@ -479,9 +519,9 @@ function App() {
                   value={formData.impact}
                   onChange={handleInputChange}
                   required
-                  rows="3"
+                  rows="4"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What impact would this have on the team?"
+                  placeholder="What impact will this have?&#10;&#10;Formatting supported:&#10;- Bullet points&#10;- Numbered lists&#10;- Multiple paragraphs"
                 />
               </div>
 
