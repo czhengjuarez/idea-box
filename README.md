@@ -6,13 +6,31 @@ A modern web application for team members to submit, prioritize, and track impro
 
 ## Features
 
-- **Submit Ideas**: Team members can submit ideas with their name, problem description, proposed solution, and potential impact
+### Idea Submission & Management
+- **Rich Text Editor**: Submit ideas with formatted text including **bold**, *italic*, underline, bullet points, and numbered lists
+- **Name Privacy Options**: Choose who can see your name:
+  - **Everyone** - Name visible to all users
+  - **PXLT Only** - Name visible only to PXLT team in admin view
+  - Leave name blank for anonymous submissions
 - **Vote on Ideas**: Upvote ideas to show support and help prioritize
 - **Drag & Drop Prioritization**: Stack rank ideas by dragging and dropping them to reorder by priority
-- **Ticket Creation**: Mark prioritized ideas as tickets and open Jira for tracking
+
+### Admin Management
+- **Secure Admin Portal**: Access management features via Settings icon (⚙️)
+  - Login: `admin@ideabox.com` / `admin123`
+- **Edit Ideas**: Admin can edit any submitted idea
+- **Create Tickets**: Mark prioritized ideas as tickets and open Jira for tracking (admin-only)
+- **Delete Ideas**: Remove ideas from the system
+
+### Organization & Display
 - **Tab Navigation**: Separate views for "Suggestions" and "Tracked" ideas
-- **R2 Storage**: All ideas are stored in Cloudflare R2 and shared across all users
-- **Real-time Sync**: Changes are automatically saved and visible to all team members
+- **Formatted Display**: Rich text formatting preserved in idea cards
+- **Real-time Sync**: Changes automatically saved and visible to all team members
+
+### Data & Storage
+- **R2 Storage**: All ideas stored in Cloudflare R2 and shared across all users
+- **Persistent Data**: Ideas persist across sessions and devices
+- **Automatic Sync**: Changes between public and admin views sync automatically
 
 ## Getting Started
 
@@ -34,6 +52,18 @@ npm run dev
 ```
 
 3. Open your browser and navigate to `http://localhost:5173`
+
+### Development Workflow
+
+This project uses a two-branch strategy:
+- **`main`** - Production branch with R2 API (deployed to Cloudflare Workers)
+- **`local-dev`** - Development branch with localStorage (for local testing)
+
+**For local development:**
+1. Checkout `local-dev` branch: `git checkout local-dev`
+2. Make changes and test locally with `npm run dev`
+3. Commit changes to `local-dev`
+4. When ready to deploy, merge to `main` (see [DEPLOY_WORKFLOW.md](./DEPLOY_WORKFLOW.md))
 
 ### Building for Production
 
@@ -90,22 +120,40 @@ For detailed R2 setup instructions, see [R2_SETUP.md](./R2_SETUP.md).
 
 ## Usage
 
+### For Team Members
+
 1. **Submit an Idea**: Click the "Submit New Idea" button and fill out the form with:
    - Idea Title
-   - Your Name
-   - Problem description
-   - Proposed Solution
-   - Potential Impact
+   - Your Name (optional)
+   - Name Visibility (Everyone or PXLT only)
+   - Problem description (with rich text formatting)
+   - Proposed Solution (with rich text formatting)
+   - Potential Impact (with rich text formatting)
 
-2. **Vote on Ideas**: Click the thumbs-up button to upvote ideas you support
+2. **Use Rich Text Formatting**: 
+   - Select text and use the toolbar to apply **bold**, *italic*, or underline
+   - Click bullet or numbered list buttons to create lists
+   - Format is preserved when displayed
 
-3. **Prioritize Ideas**: Drag ideas up or down using the grip handle to reorder them by priority
+3. **Vote on Ideas**: Click the thumbs-up button to upvote ideas you support
 
-4. **Create Tickets**: Click the "Create Ticket" button on prioritized ideas to open Jira and mark them as tracked
+4. **Prioritize Ideas**: Drag ideas up or down using the grip handle to reorder them by priority
 
 5. **View Tracked Ideas**: Switch to the "Tracked" tab to see ideas that have been converted to tickets
 
-6. **Edit or Delete**: Use the edit button to modify ideas or delete button to remove them
+### For Administrators
+
+1. **Access Admin Portal**: Click the Settings icon (⚙️) in the top right corner
+
+2. **Login**: Use credentials `admin@ideabox.com` / `admin123`
+
+3. **Manage Ideas**: In the admin portal you can:
+   - View all submitted ideas with full name visibility
+   - Edit any idea (title, name, visibility, problem, solution, impact)
+   - Delete ideas
+   - Create tickets for prioritized ideas (opens Jira)
+
+4. **Return to Public View**: Click "Back to Public View" to return to the main page
 
 All changes are automatically saved to R2 storage and synced across all users in real-time.
 
