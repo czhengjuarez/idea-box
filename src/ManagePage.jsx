@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Eye, EyeOff, ArrowLeft, Trash2, CheckCircle } from 'lucide-react'
+import { Eye, EyeOff, ArrowLeft, Trash2, CheckCircle, Pencil, X, Plus } from 'lucide-react'
 
 // Helper function to get display name (same as App.jsx but always in admin mode)
 function getDisplayName(idea) {
@@ -112,6 +112,15 @@ function LoginForm({ onLogin }) {
 function ManagePage({ onBack }) {
   const [ideas, setIdeas] = useState([])
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [editingId, setEditingId] = useState(null)
+  const [formData, setFormData] = useState({
+    title: '',
+    submittedBy: '',
+    nameVisibility: 'everyone',
+    problem: '',
+    solution: '',
+    impact: '',
+  })
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -144,6 +153,45 @@ function ManagePage({ onBack }) {
     localStorage.setItem('ideaBoxIdeas', JSON.stringify(updatedIdeas))
   }
 
+  const handleEdit = (id) => {
+    const ideaToEdit = ideas.find((idea) => idea.id === id)
+    if (ideaToEdit) {
+      setFormData({
+        title: ideaToEdit.title,
+        submittedBy: ideaToEdit.submittedBy || '',
+        nameVisibility: ideaToEdit.nameVisibility || 'everyone',
+        problem: ideaToEdit.problem,
+        solution: ideaToEdit.solution,
+        impact: ideaToEdit.impact,
+      })
+      setEditingId(id)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const updatedIdeas = ideas.map((idea) =>
+      idea.id === editingId ? { ...idea, ...formData } : idea
+    )
+    setIdeas(updatedIdeas)
+    localStorage.setItem('ideaBoxIdeas', JSON.stringify(updatedIdeas))
+    setEditingId(null)
+    setFormData({
+      title: '',
+      submittedBy: '',
+      nameVisibility: 'everyone',
+      problem: '',
+      solution: '',
+      impact: '',
+    })
+  }
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData({ ...formData, [name]: value })
+  }
+
   if (!isAuthenticated) {
     return <LoginForm onLogin={() => setIsAuthenticated(true)} />
   }
@@ -165,6 +213,145 @@ function ManagePage({ onBack }) {
             View all ideas including restricted submissions. Total: {ideas.length}
           </p>
         </div>
+
+        {/* Edit Form */}
+        {editingId && (
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-semibold text-gray-800">Edit Idea</h2>
+              <button
+                onClick={() => {
+                  setEditingId(null)
+                  setFormData({
+                    title: '',
+                    submittedBy: '',
+                    nameVisibility: 'everyone',
+                    problem: '',
+                    solution: '',
+                    impact: '',
+                  })
+                }}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <X size={24} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Idea Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Submitted By
+                </label>
+                <input
+                  type="text"
+                  name="submittedBy"
+                  value={formData.submittedBy}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                
+                <div className="mt-2">
+                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                    Name Visibility
+                  </label>
+                  <select
+                    name="nameVisibility"
+                    value={formData.nameVisibility}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  >
+                    <option value="everyone">Everyone can see name</option>
+                    <option value="pxlt">Only PXLT can see name</option>
+                    <option value="ops">Only Ops can see name</option>
+                    <option value="anonymous">Anonymous</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Problem *
+                </label>
+                <textarea
+                  name="problem"
+                  value={formData.problem}
+                  onChange={handleInputChange}
+                  required
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Proposed Solution *
+                </label>
+                <textarea
+                  name="solution"
+                  value={formData.solution}
+                  onChange={handleInputChange}
+                  required
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Potential Impact *
+                </label>
+                <textarea
+                  name="impact"
+                  value={formData.impact}
+                  onChange={handleInputChange}
+                  required
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div className="flex gap-2">
+                <button
+                  type="submit"
+                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setEditingId(null)
+                    setFormData({
+                      title: '',
+                      submittedBy: '',
+                      nameVisibility: 'everyone',
+                      problem: '',
+                      solution: '',
+                      impact: '',
+                    })
+                  }}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 transition-colors font-medium"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        )}
 
         {/* Ideas List */}
         {ideas.length === 0 ? (
@@ -234,6 +421,13 @@ function ManagePage({ onBack }) {
                       Create Ticket
                     </button>
                   )}
+                  <button
+                    onClick={() => handleEdit(idea.id)}
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
+                  >
+                    <Pencil size={16} />
+                    Edit
+                  </button>
                   <button
                     onClick={() => handleDelete(idea.id)}
                     className="flex items-center gap-1 px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition-colors text-sm"
