@@ -3,7 +3,8 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp } from 'lucide-react'
+import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp, Settings } from 'lucide-react'
+import ManagePage from './ManagePage'
 
 // Custom Lightbulb Icon Component
 function LightbulbIcon({ size = 20, className = '' }) {
@@ -35,20 +36,30 @@ function LightbulbIcon({ size = 20, className = '' }) {
 }
 
 // Helper function to get display name based on visibility settings
-function getDisplayName(idea) {
+// isAdmin: true when viewing from manage page, false for public page
+function getDisplayName(idea, isAdmin = false) {
   if (!idea.submittedBy) return null
   
   const visibility = idea.nameVisibility || 'everyone'
   
+  // On public page, hide restricted names
+  if (!isAdmin) {
+    if (visibility === 'everyone') {
+      return idea.submittedBy
+    }
+    return null // Hide PXLT, Ops, and Anonymous on public page
+  }
+  
+  // On admin/manage page, show everything with labels
   switch (visibility) {
     case 'everyone':
       return idea.submittedBy
     case 'pxlt':
-      return `${idea.submittedBy} (visible to PXLT only)`
+      return `${idea.submittedBy} (PXLT only)`
     case 'ops':
-      return `${idea.submittedBy} (visible to Ops only)`
+      return `${idea.submittedBy} (Ops only)`
     case 'anonymous':
-      return null
+      return 'Anonymous'
     default:
       return idea.submittedBy
   }
@@ -182,6 +193,7 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
 }
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('main') // 'main' or 'manage'
   const [ideas, setIdeas] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -318,6 +330,11 @@ function App() {
     setFormData({ ...formData, [name]: value })
   }
 
+  // Route to manage page if selected
+  if (currentPage === 'manage') {
+    return <ManagePage onBack={() => setCurrentPage('main')} />
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -331,6 +348,15 @@ function App() {
             Share your ideas for team improvements! Submit problems, solutions, and potential impacts. 
             Drag to prioritize and create tickets for top ideas.
           </p>
+          
+          {/* Manage Button */}
+          <button
+            onClick={() => setCurrentPage('manage')}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <Settings size={16} />
+            Manage Submissions
+          </button>
         </div>
 
         {/* Add Idea Button */}
