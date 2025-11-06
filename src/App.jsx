@@ -5,6 +5,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp, Settings } from 'lucide-react'
 import ManagePage from './ManagePage'
+import RichTextEditor from './RichTextEditor'
 
 // Custom Lightbulb Icon Component
 function LightbulbIcon({ size = 20, className = '' }) {
@@ -35,37 +36,16 @@ function LightbulbIcon({ size = 20, className = '' }) {
   )
 }
 
-// Component to render formatted text with preserved line breaks and bullet points
+// Component to render rich text HTML content
 function FormattedText({ text }) {
   if (!text) return null
   
+  // Render HTML content from rich text editor
   return (
-    <div className="whitespace-pre-wrap">
-      {text.split('\n').map((line, index) => {
-        // Check if line starts with bullet point markers
-        const trimmedLine = line.trim()
-        if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ') || trimmedLine.startsWith('* ')) {
-          return (
-            <div key={index} className="flex gap-2 ml-4">
-              <span>•</span>
-              <span>{trimmedLine.substring(2)}</span>
-            </div>
-          )
-        }
-        // Check for numbered lists
-        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.*)/)
-        if (numberedMatch) {
-          return (
-            <div key={index} className="flex gap-2 ml-4">
-              <span>{numberedMatch[1]}.</span>
-              <span>{numberedMatch[2]}</span>
-            </div>
-          )
-        }
-        // Regular line
-        return <div key={index}>{line || '\u00A0'}</div>
-      })}
-    </div>
+    <div 
+      className="rich-text-content prose prose-sm max-w-none"
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
   )
 }
 
@@ -481,47 +461,38 @@ function App() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Problem *
                 </label>
-                <textarea
-                  name="problem"
+                <RichTextEditor
                   value={formData.problem}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, problem: value })}
+                  placeholder="What problem does this address? Use the toolbar to format text."
                   required
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What problem does this address?&#10;&#10;Tip: Use bullet points with - or • for lists&#10;Example:&#10;- Point 1&#10;- Point 2"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Proposed Solution *
                 </label>
-                <textarea
-                  name="solution"
+                <RichTextEditor
                   value={formData.solution}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, solution: value })}
+                  placeholder="How would you solve this? Use bold, italic, bullets, etc."
                   required
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="How would you solve this?&#10;&#10;You can use:&#10;- Bullet points (-, •, *)&#10;- Numbered lists (1. 2. 3.)&#10;- Line breaks for paragraphs"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Potential Impact *
                 </label>
-                <textarea
-                  name="impact"
+                <RichTextEditor
                   value={formData.impact}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, impact: value })}
+                  placeholder="What impact will this have? Format your text as needed."
                   required
-                  rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What impact will this have?&#10;&#10;Formatting supported:&#10;- Bullet points&#10;- Numbered lists&#10;- Multiple paragraphs"
                 />
               </div>
 

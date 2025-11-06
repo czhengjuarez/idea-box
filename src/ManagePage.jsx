@@ -1,37 +1,16 @@
 import { useState, useEffect } from 'react'
 import { Eye, EyeOff, ArrowLeft, Trash2, CheckCircle, Pencil, X, Plus } from 'lucide-react'
 
-// Component to render formatted text with preserved line breaks and bullet points
+// Component to render rich text HTML content
 function FormattedText({ text }) {
   if (!text) return null
   
+  // Render HTML content from rich text editor
   return (
-    <div className="whitespace-pre-wrap">
-      {text.split('\n').map((line, index) => {
-        // Check if line starts with bullet point markers
-        const trimmedLine = line.trim()
-        if (trimmedLine.startsWith('- ') || trimmedLine.startsWith('• ') || trimmedLine.startsWith('* ')) {
-          return (
-            <div key={index} className="flex gap-2 ml-4">
-              <span>•</span>
-              <span>{trimmedLine.substring(2)}</span>
-            </div>
-          )
-        }
-        // Check for numbered lists
-        const numberedMatch = trimmedLine.match(/^(\d+)\.\s+(.*)/)
-        if (numberedMatch) {
-          return (
-            <div key={index} className="flex gap-2 ml-4">
-              <span>{numberedMatch[1]}.</span>
-              <span>{numberedMatch[2]}</span>
-            </div>
-          )
-        }
-        // Regular line
-        return <div key={index}>{line || '\u00A0'}</div>
-      })}
-    </div>
+    <div 
+      className="rich-text-content prose prose-sm max-w-none"
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
   )
 }
 
