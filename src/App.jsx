@@ -131,9 +131,21 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
         </div>
         
         {idea.status === 'ticket' && (
-          <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
-            <CheckCircle size={16} />
-            Ticket Created
+          <span className="flex items-center gap-2">
+            <span className="flex items-center gap-1 text-green-600 text-sm font-medium">
+              <CheckCircle size={16} />
+              Ticket Created
+            </span>
+            {idea.ticketUrl && (
+              <a
+                href={idea.ticketUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-600 hover:text-blue-800 underline text-sm"
+              >
+                View Ticket
+              </a>
+            )}
           </span>
         )}
       </div>

@@ -126,6 +126,8 @@ function ManagePage({ onBack }) {
     problem: '',
     solution: '',
     impact: '',
+    ticketUrl: '',
+    status: '',
   })
 
   useEffect(() => {
@@ -153,8 +155,11 @@ function ManagePage({ onBack }) {
   }
 
   const handleCreateTicket = (id) => {
+    const ticketUrl = prompt('Enter the ticket URL (e.g., Jira link):')
+    if (ticketUrl === null) return // User cancelled
+    
     const updatedIdeas = ideas.map((idea) =>
-      idea.id === id ? { ...idea, status: 'ticket' } : idea
+      idea.id === id ? { ...idea, status: 'ticket', ticketUrl: ticketUrl || '' } : idea
     )
     setIdeas(updatedIdeas)
     fetch('/api/ideas', {
@@ -174,6 +179,8 @@ function ManagePage({ onBack }) {
         problem: ideaToEdit.problem,
         solution: ideaToEdit.solution,
         impact: ideaToEdit.impact,
+        ticketUrl: ideaToEdit.ticketUrl || '',
+        status: ideaToEdit.status || '',
       })
       setEditingId(id)
       window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -199,6 +206,8 @@ function ManagePage({ onBack }) {
       problem: '',
       solution: '',
       impact: '',
+      ticketUrl: '',
+      status: '',
     })
   }
 
@@ -352,6 +361,22 @@ function ManagePage({ onBack }) {
                 />
               </div>
 
+              {formData.status === 'ticket' && (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Ticket URL
+                  </label>
+                  <input
+                    type="url"
+                    name="ticketUrl"
+                    value={formData.ticketUrl}
+                    onChange={handleInputChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="https://jira.example.com/browse/TICKET-123"
+                  />
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <button
                   type="submit"
@@ -410,9 +435,21 @@ function ManagePage({ onBack }) {
                         {idea.votes || 0} votes
                       </span>
                       {idea.status === 'ticket' && (
-                        <span className="flex items-center gap-1 text-green-600 font-medium">
-                          <CheckCircle size={16} />
-                          Ticket Created
+                        <span className="flex items-center gap-2">
+                          <span className="flex items-center gap-1 text-green-600 font-medium">
+                            <CheckCircle size={16} />
+                            Ticket Created
+                          </span>
+                          {idea.ticketUrl && (
+                            <a
+                              href={idea.ticketUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 underline text-sm"
+                            >
+                              View Ticket
+                            </a>
+                          )}
                         </span>
                       )}
                     </div>
