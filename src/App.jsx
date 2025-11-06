@@ -3,7 +3,9 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp } from 'lucide-react'
+import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp, Settings } from 'lucide-react'
+import ManagePage from './ManagePage'
+import RichTextEditor from './RichTextEditor'
 
 // Custom Lightbulb Icon Component
 function LightbulbIcon({ size = 20, className = '' }) {
@@ -34,8 +36,46 @@ function LightbulbIcon({ size = 20, className = '' }) {
   )
 }
 
+// Component to render rich text HTML content
+function FormattedText({ text }) {
+  if (!text) return null
+  
+  // Render HTML content from rich text editor
+  return (
+    <div 
+      className="rich-text-content prose prose-sm max-w-none"
+      dangerouslySetInnerHTML={{ __html: text }}
+    />
+  )
+}
+
+// Helper function to get display name based on visibility settings
+// isAdmin: true when viewing from manage page, false for public page
+function getDisplayName(idea, isAdmin = false) {
+  // If no name provided, it's anonymous
+  if (!idea.submittedBy) {
+    return isAdmin ? 'Anonymous' : null
+  }
+  
+  const visibility = idea.nameVisibility || 'everyone'
+  
+  // On public page, hide restricted names
+  if (!isAdmin) {
+    if (visibility === 'everyone') {
+      return idea.submittedBy
+    }
+    return null // Hide PXLT on public page
+  }
+  
+  // On admin/manage page, show everything with labels
+  if (visibility === 'pxlt') {
+    return `${idea.submittedBy} (PXLT only)`
+  }
+  return idea.submittedBy
+}
+
 // Sortable Idea Card Component
-function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
+function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
   const {
     attributes,
     listeners,
@@ -103,24 +143,32 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
         <div className="flex flex-col gap-3">
           <h3 className="font-semibold text-lg text-gray-800">{idea.title}</h3>
           
-          <p className="text-sm text-gray-600">
-            <span className="font-medium">Submitted by:</span> {idea.submittedBy}
-          </p>
+          {getDisplayName(idea) && (
+            <p className="text-sm text-gray-600">
+              <span className="font-medium">Submitted by:</span> {getDisplayName(idea)}
+            </p>
+          )}
           
           <div className="flex flex-col gap-2 text-sm">
             <div>
               <span className="font-medium text-gray-700">Problem:</span>
-              <p className="text-gray-600 mt-1">{idea.problem}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.problem} />
+              </div>
             </div>
             
             <div>
               <span className="font-medium text-gray-700">Proposed Solution:</span>
-              <p className="text-gray-600 mt-1">{idea.solution}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.solution} />
+              </div>
             </div>
             
             <div>
               <span className="font-medium text-gray-700">Potential Impact:</span>
-              <p className="text-gray-600 mt-1">{idea.impact}</p>
+              <div className="text-gray-600 mt-1">
+                <FormattedText text={idea.impact} />
+              </div>
             </div>
           </div>
         </div>
@@ -128,18 +176,6 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
 
       {/* Buttons at bottom */}
       <div className="flex gap-2 px-6 pb-6 pt-3 border-t border-gray-100 flex-wrap">
-        {idea.status !== 'ticket' && (
-          <button
-            onClick={() => {
-              window.open('https://jira.cfdata.org/browse/DES-12825', '_blank', 'noopener,noreferrer')
-              onCreateTicket(idea.id)
-            }}
-            className="flex items-center gap-1 px-3 py-1.5 border border-[#0051C3] text-[#0051C3] bg-white rounded hover:bg-blue-50 transition-colors text-sm"
-          >
-            <CheckCircle size={16} />
-            Create Ticket
-          </button>
-        )}
         <button
           onClick={() => onEdit(idea.id)}
           className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
@@ -160,6 +196,7 @@ function SortableIdeaCard({ idea, onDelete, onCreateTicket, onEdit, onVote }) {
 }
 
 function App() {
+  const [currentPage, setCurrentPage] = useState('main') // 'main' or 'manage'
   const [ideas, setIdeas] = useState([])
   const [showForm, setShowForm] = useState(false)
   const [editingId, setEditingId] = useState(null)
@@ -168,6 +205,7 @@ function App() {
   const [formData, setFormData] = useState({
     title: '',
     submittedBy: '',
+    nameVisibility: 'everyone', // 'everyone', 'pxlt', 'ops', 'anonymous'
     problem: '',
     solution: '',
     impact: '',
@@ -179,6 +217,27 @@ function App() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
+
+  // Scroll to top when form is shown
+  useEffect(() => {
+    if (showForm) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [showForm])
+
+  // Reload ideas when returning from manage page
+  useEffect(() => {
+    if (currentPage === 'main') {
+      fetch('/api/ideas')
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data)) {
+            setIdeas(data)
+          }
+        })
+        .catch(err => console.error('Error reloading ideas:', err))
+    }
+  }, [currentPage])
 
   // Load ideas from R2 API on mount
   useEffect(() => {
@@ -243,6 +302,7 @@ function App() {
     setFormData({
       title: '',
       submittedBy: '',
+      nameVisibility: 'everyone',
       problem: '',
       solution: '',
       impact: '',
@@ -254,18 +314,13 @@ function App() {
     setIdeas(ideas.filter((idea) => idea.id !== id))
   }
 
-  const handleCreateTicket = (id) => {
-    setIdeas(ideas.map((idea) => 
-      idea.id === id ? { ...idea, status: 'ticket' } : idea
-    ))
-  }
-
   const handleEdit = (id) => {
     const ideaToEdit = ideas.find((idea) => idea.id === id)
     if (ideaToEdit) {
       setFormData({
         title: ideaToEdit.title,
         submittedBy: ideaToEdit.submittedBy,
+        nameVisibility: ideaToEdit.nameVisibility || 'everyone',
         problem: ideaToEdit.problem,
         solution: ideaToEdit.solution,
         impact: ideaToEdit.impact,
@@ -286,6 +341,11 @@ function App() {
     setFormData({ ...formData, [name]: value })
   }
 
+  // Route to manage page if selected
+  if (currentPage === 'manage') {
+    return <ManagePage onBack={() => setCurrentPage('main')} />
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-4 py-8">
@@ -299,6 +359,15 @@ function App() {
             Share your ideas for team improvements! Submit problems, solutions, and potential impacts. 
             Drag to prioritize and create tickets for top ideas.
           </p>
+          
+          {/* Manage Button */}
+          <button
+            onClick={() => setCurrentPage('manage')}
+            className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <Settings size={16} />
+            Manage Submissions
+          </button>
         </div>
 
         {/* Add Idea Button */}
@@ -324,6 +393,7 @@ function App() {
                   setFormData({
                     title: '',
                     submittedBy: '',
+                    nameVisibility: 'everyone',
                     problem: '',
                     solution: '',
                     impact: '',
@@ -353,61 +423,81 @@ function App() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Your Name *
+                  Your Name <span className="text-gray-400 text-xs">(optional)</span>
                 </label>
                 <input
                   type="text"
                   name="submittedBy"
                   value={formData.submittedBy}
                   onChange={handleInputChange}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Your name"
+                  placeholder="Your name (optional)"
                 />
+                
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-2">
+                    Who can see your name?
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="everyone"
+                        checked={formData.nameVisibility === 'everyone'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Everyone</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="pxlt"
+                        checked={formData.nameVisibility === 'pxlt'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">PXLT only</span>
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Problem *
                 </label>
-                <textarea
-                  name="problem"
+                <RichTextEditor
                   value={formData.problem}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, problem: value })}
+                  placeholder="What problem does this address? Use the toolbar to format text."
                   required
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What problem does this address?"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Proposed Solution *
                 </label>
-                <textarea
-                  name="solution"
+                <RichTextEditor
                   value={formData.solution}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, solution: value })}
+                  placeholder="How would you solve this? Use bold, italic, bullets, etc."
                   required
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="How would you solve this?"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
                   Potential Impact *
                 </label>
-                <textarea
-                  name="impact"
+                <RichTextEditor
                   value={formData.impact}
-                  onChange={handleInputChange}
+                  onChange={(value) => setFormData({ ...formData, impact: value })}
+                  placeholder="What impact will this have? Format your text as needed."
                   required
-                  rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="What impact would this have on the team?"
                 />
               </div>
 
@@ -495,7 +585,6 @@ function App() {
                       key={idea.id}
                       idea={idea}
                       onDelete={handleDelete}
-                      onCreateTicket={handleCreateTicket}
                       onEdit={handleEdit}
                       onVote={handleVote}
                     />
