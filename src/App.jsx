@@ -180,32 +180,32 @@ function App() {
     })
   )
 
-  // Load ideas from R2 API on mount
+  // LOCAL DEV: Load ideas from localStorage on mount
   useEffect(() => {
-    fetch('/api/ideas')
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          setIdeas(data)
+    try {
+      const storedIdeas = localStorage.getItem('ideaBoxIdeas')
+      if (storedIdeas) {
+        const parsedIdeas = JSON.parse(storedIdeas)
+        if (Array.isArray(parsedIdeas)) {
+          setIdeas(parsedIdeas)
         }
-        setIsLoaded(true)
-      })
-      .catch(err => {
-        console.error('Error loading ideas:', err)
-        setIsLoaded(true)
-      })
+      }
+    } catch (err) {
+      console.error('Error loading ideas from localStorage:', err)
+    } finally {
+      setIsLoaded(true)
+    }
   }, [])
 
-  // Save ideas to R2 API whenever they change (but not on initial load)
+  // LOCAL DEV: Save ideas to localStorage whenever they change
   useEffect(() => {
     if (isLoaded) {
-      fetch('/api/ideas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ideas)
-      })
-      .then(() => console.log('Ideas saved to R2'))
-      .catch(err => console.error('Error saving ideas:', err))
+      try {
+        localStorage.setItem('ideaBoxIdeas', JSON.stringify(ideas))
+        console.log('💾 Ideas saved to localStorage')
+      } catch (err) {
+        console.error('Error saving ideas to localStorage:', err)
+      }
     }
   }, [ideas, isLoaded])
 
