@@ -25,8 +25,6 @@ function getDisplayName(idea) {
       return `${idea.submittedBy} (Public)`
     case 'pxlt':
       return `${idea.submittedBy} (PXLT only)`
-    case 'ops':
-      return `${idea.submittedBy} (Ops only)`
     case 'anonymous':
       return 'Anonymous submission'
     default:
@@ -289,7 +287,6 @@ function ManagePage({ onBack }) {
                   >
                     <option value="everyone">Everyone can see name</option>
                     <option value="pxlt">Only PXLT can see name</option>
-                    <option value="ops">Only Ops can see name</option>
                     <option value="anonymous">Anonymous</option>
                   </select>
                 </div>

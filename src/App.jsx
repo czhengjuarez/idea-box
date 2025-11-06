@@ -61,7 +61,7 @@ function getDisplayName(idea, isAdmin = false) {
     if (visibility === 'everyone') {
       return idea.submittedBy
     }
-    return null // Hide PXLT, Ops, and Anonymous on public page
+    return null // Hide PXLT and Anonymous on public page
   }
   
   // On admin/manage page, show everything with labels
@@ -70,8 +70,6 @@ function getDisplayName(idea, isAdmin = false) {
       return idea.submittedBy
     case 'pxlt':
       return `${idea.submittedBy} (PXLT only)`
-    case 'ops':
-      return `${idea.submittedBy} (Ops only)`
     case 'anonymous':
       return 'Anonymous'
     default:
@@ -454,7 +452,6 @@ function App() {
                   >
                     <option value="everyone">Everyone can see my name</option>
                     <option value="pxlt">Only PXLT can see my name</option>
-                    <option value="ops">Only Ops can see my name</option>
                     <option value="anonymous">Submit anonymously (no name shown)</option>
                   </select>
                 </div>
