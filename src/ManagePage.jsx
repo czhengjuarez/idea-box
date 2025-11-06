@@ -16,20 +16,15 @@ function FormattedText({ text }) {
 
 // Helper function to get display name (same as App.jsx but always in admin mode)
 function getDisplayName(idea) {
-  if (!idea.submittedBy) return 'No name provided'
+  // If no name provided, it's anonymous
+  if (!idea.submittedBy) return 'Anonymous'
   
   const visibility = idea.nameVisibility || 'everyone'
   
-  switch (visibility) {
-    case 'everyone':
-      return `${idea.submittedBy} (Public)`
-    case 'pxlt':
-      return `${idea.submittedBy} (PXLT only)`
-    case 'anonymous':
-      return 'Anonymous submission'
-    default:
-      return idea.submittedBy
+  if (visibility === 'pxlt') {
+    return `${idea.submittedBy} (PXLT only)`
   }
+  return `${idea.submittedBy} (Public)`
 }
 
 function LoginForm({ onLogin }) {
@@ -275,20 +270,34 @@ function ManagePage({ onBack }) {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 
-                <div className="mt-2">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-2">
                     Name Visibility
                   </label>
-                  <select
-                    name="nameVisibility"
-                    value={formData.nameVisibility}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  >
-                    <option value="everyone">Everyone can see name</option>
-                    <option value="pxlt">Only PXLT can see name</option>
-                    <option value="anonymous">Anonymous</option>
-                  </select>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="everyone"
+                        checked={formData.nameVisibility === 'everyone'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Everyone</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="pxlt"
+                        checked={formData.nameVisibility === 'pxlt'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">PXLT only</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 

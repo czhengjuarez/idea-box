@@ -52,7 +52,10 @@ function FormattedText({ text }) {
 // Helper function to get display name based on visibility settings
 // isAdmin: true when viewing from manage page, false for public page
 function getDisplayName(idea, isAdmin = false) {
-  if (!idea.submittedBy) return null
+  // If no name provided, it's anonymous
+  if (!idea.submittedBy) {
+    return isAdmin ? 'Anonymous' : null
+  }
   
   const visibility = idea.nameVisibility || 'everyone'
   
@@ -61,20 +64,14 @@ function getDisplayName(idea, isAdmin = false) {
     if (visibility === 'everyone') {
       return idea.submittedBy
     }
-    return null // Hide PXLT and Anonymous on public page
+    return null // Hide PXLT on public page
   }
   
   // On admin/manage page, show everything with labels
-  switch (visibility) {
-    case 'everyone':
-      return idea.submittedBy
-    case 'pxlt':
-      return `${idea.submittedBy} (PXLT only)`
-    case 'anonymous':
-      return 'Anonymous'
-    default:
-      return idea.submittedBy
+  if (visibility === 'pxlt') {
+    return `${idea.submittedBy} (PXLT only)`
   }
+  return idea.submittedBy
 }
 
 // Sortable Idea Card Component
@@ -440,20 +437,34 @@ function App() {
                   placeholder="Your name (optional)"
                 />
                 
-                <div className="mt-2">
-                  <label className="block text-xs font-medium text-gray-600 mb-1">
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-gray-600 mb-2">
                     Who can see your name?
                   </label>
-                  <select
-                    name="nameVisibility"
-                    value={formData.nameVisibility}
-                    onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                  >
-                    <option value="everyone">Everyone can see my name</option>
-                    <option value="pxlt">Only PXLT can see my name</option>
-                    <option value="anonymous">Submit anonymously (no name shown)</option>
-                  </select>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="everyone"
+                        checked={formData.nameVisibility === 'everyone'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">Everyone</span>
+                    </label>
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="radio"
+                        name="nameVisibility"
+                        value="pxlt"
+                        checked={formData.nameVisibility === 'pxlt'}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                      />
+                      <span className="text-sm text-gray-700">PXLT only</span>
+                    </label>
+                  </div>
                 </div>
               </div>
 
