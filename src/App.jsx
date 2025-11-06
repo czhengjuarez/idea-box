@@ -182,6 +182,13 @@ function App() {
     })
   )
 
+  // Scroll to top when form is shown
+  useEffect(() => {
+    if (showForm) {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+  }, [showForm])
+
   // LOCAL DEV: Load ideas from localStorage on mount
   useEffect(() => {
     try {
@@ -274,8 +281,6 @@ function App() {
       })
       setEditingId(id)
       setShowForm(true)
-      // Scroll to top to show the form
-      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
   }
 
@@ -308,10 +313,7 @@ function App() {
         {/* Add Idea Button */}
         {!showForm && (
           <button
-            onClick={() => {
-              setShowForm(true)
-              window.scrollTo({ top: 0, behavior: 'smooth' })
-            }}
+            onClick={() => setShowForm(true)}
             className="w-full mb-6 flex items-center justify-center gap-2 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md font-medium"
           >
             <Plus size={20} />
