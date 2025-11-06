@@ -1,43 +1,93 @@
-import { useEffect, useRef } from 'react'
-import ReactQuill from 'react-quill'
-import 'react-quill/dist/quill.snow.css'
+import { useRef, useEffect } from 'react'
+import { Bold, Italic, Underline, List, ListOrdered } from 'lucide-react'
 
 function RichTextEditor({ value, onChange, placeholder, required }) {
-  const quillRef = useRef(null)
+  const editorRef = useRef(null)
 
-  // Toolbar configuration - simplified for common formatting
-  const modules = {
-    toolbar: [
-      ['bold', 'italic', 'underline'],
-      [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-      ['clean']
-    ]
+  useEffect(() => {
+    if (editorRef.current && value !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = value || ''
+    }
+  }, [value])
+
+  const handleInput = () => {
+    if (editorRef.current) {
+      onChange(editorRef.current.innerHTML)
+    }
   }
 
-  const formats = [
-    'bold', 'italic', 'underline',
-    'list', 'bullet'
-  ]
+  const execCommand = (command, value = null) => {
+    document.execCommand(command, false, value)
+    editorRef.current?.focus()
+    handleInput()
+  }
 
   return (
     <div className="rich-text-editor">
-      <ReactQuill
-        ref={quillRef}
-        theme="snow"
-        value={value}
-        onChange={onChange}
-        modules={modules}
-        formats={formats}
-        placeholder={placeholder}
-        className="bg-white"
+      {/* Toolbar */}
+      <div className="toolbar flex gap-1 p-2 bg-gray-50 border border-gray-300 rounded-t-md">
+        <button
+          type="button"
+          onClick={() => execCommand('bold')}
+          className="p-2 hover:bg-gray-200 rounded"
+          title="Bold"
+        >
+          <Bold size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('italic')}
+          className="p-2 hover:bg-gray-200 rounded"
+          title="Italic"
+        >
+          <Italic size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('underline')}
+          className="p-2 hover:bg-gray-200 rounded"
+          title="Underline"
+        >
+          <Underline size={16} />
+        </button>
+        <div className="w-px bg-gray-300 mx-1"></div>
+        <button
+          type="button"
+          onClick={() => execCommand('insertUnorderedList')}
+          className="p-2 hover:bg-gray-200 rounded"
+          title="Bullet List"
+        >
+          <List size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => execCommand('insertOrderedList')}
+          className="p-2 hover:bg-gray-200 rounded"
+          title="Numbered List"
+        >
+          <ListOrdered size={16} />
+        </button>
+      </div>
+
+      {/* Editor */}
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={handleInput}
+        onBlur={handleInput}
+        className="editor-content min-h-[120px] p-3 border border-t-0 border-gray-300 rounded-b-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        data-placeholder={placeholder}
+        suppressContentEditableWarning
       />
-      {required && !value && (
+
+      {/* Hidden input for form validation */}
+      {required && (
         <input
           type="text"
           required
-          value={value}
+          value={value || ''}
           onChange={() => {}}
-          style={{ opacity: 0, height: 0, position: 'absolute' }}
+          style={{ opacity: 0, height: 0, position: 'absolute', pointerEvents: 'none' }}
           tabIndex={-1}
         />
       )}
