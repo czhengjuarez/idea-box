@@ -12,3 +12,10 @@ bucket = "./dist"
 [[r2_buckets]]
 binding = "IDEA_BOX_STORAGE"
 bucket_name = "idea-box"
+
+[observability]
+[observability.logs]
+enabled = false
+head_sampling_rate = 1
+invocation_logs = true
+persist = true
