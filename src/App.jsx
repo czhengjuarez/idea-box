@@ -75,7 +75,7 @@ function getDisplayName(idea, isAdmin = false) {
 }
 
 // Sortable Idea Card Component
-function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
+function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted }) {
   const {
     attributes,
     listeners,
@@ -123,10 +123,14 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote }) {
           {/* Vote button and count */}
           <button
             onClick={() => onVote(idea.id)}
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded border border-gray-300 hover:border-blue-500 hover:bg-blue-50 transition-colors"
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded border transition-colors ${
+              hasVoted
+                ? 'border-blue-500 bg-blue-50 text-blue-600'
+                : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+            }`}
           >
-            <ThumbsUp size={16} className="text-gray-600" />
-            <span className="text-sm font-medium text-gray-700">{idea.votes || 0}</span>
+            <ThumbsUp size={16} className={hasVoted ? 'text-blue-600 fill-blue-600' : 'text-gray-600'} />
+            <span className={`text-sm font-medium ${hasVoted ? 'text-blue-600' : 'text-gray-700'}`}>{idea.votes || 0}</span>
           </button>
         </div>
         
@@ -214,6 +218,11 @@ function App() {
   const [editingId, setEditingId] = useState(null)
   const [activeTab, setActiveTab] = useState('suggestions') // 'suggestions' or 'tracked'
   const [isLoaded, setIsLoaded] = useState(false)
+  const [votedIdeas, setVotedIdeas] = useState(() => {
+    // Load voted ideas from sessionStorage on mount
+    const stored = sessionStorage.getItem('votedIdeas')
+    return stored ? JSON.parse(stored) : []
+  })
   const [formData, setFormData] = useState({
     title: '',
     submittedBy: '',
@@ -343,9 +352,25 @@ function App() {
   }
 
   const handleVote = (id) => {
-    setIdeas(ideas.map((idea) => 
-      idea.id === id ? { ...idea, votes: (idea.votes || 0) + 1 } : idea
-    ))
+    const hasVoted = votedIdeas.includes(id)
+    
+    if (hasVoted) {
+      // Remove vote
+      setIdeas(ideas.map((idea) => 
+        idea.id === id ? { ...idea, votes: Math.max((idea.votes || 0) - 1, 0) } : idea
+      ))
+      const newVotedIdeas = votedIdeas.filter(ideaId => ideaId !== id)
+      setVotedIdeas(newVotedIdeas)
+      sessionStorage.setItem('votedIdeas', JSON.stringify(newVotedIdeas))
+    } else {
+      // Add vote
+      setIdeas(ideas.map((idea) => 
+        idea.id === id ? { ...idea, votes: (idea.votes || 0) + 1 } : idea
+      ))
+      const newVotedIdeas = [...votedIdeas, id]
+      setVotedIdeas(newVotedIdeas)
+      sessionStorage.setItem('votedIdeas', JSON.stringify(newVotedIdeas))
+    }
   }
 
   const handleInputChange = (e) => {
@@ -599,6 +624,7 @@ function App() {
                       onDelete={handleDelete}
                       onEdit={handleEdit}
                       onVote={handleVote}
+                      hasVoted={votedIdeas.includes(idea.id)}
                     />
                   ))}
                 </SortableContext>
