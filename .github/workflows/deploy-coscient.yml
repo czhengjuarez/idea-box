@@ -26,9 +26,9 @@ jobs:
         env:
           CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: |
-          cat > google-auth-config.js << EOF
-          export const GOOGLE_CLIENT_ID = '${CLIENT_ID}'
-          EOF
+          # Strip any whitespace/newlines from CLIENT_ID
+          CLEAN_ID=$(echo "${CLIENT_ID}" | tr -d '\n\r' | xargs)
+          echo "export const GOOGLE_CLIENT_ID = '${CLEAN_ID}'" > google-auth-config.js
           echo "Created google-auth-config.js"
 
       - name: Build
