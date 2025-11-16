@@ -126,26 +126,39 @@ function ManagePage({ onBack }) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Load ideas from R2 API
-      fetch('/api/ideas')
-        .then(res => res.json())
-        .then(data => {
-          if (data && Array.isArray(data)) {
-            setIdeas(data)
+      // Load ideas from localStorage and migrate legacy entries
+      const stored = localStorage.getItem('ideas')
+      if (stored) {
+        try {
+          const data = JSON.parse(stored)
+          if (Array.isArray(data)) {
+            // Migrate legacy entries without ownerEmail
+            const migratedIdeas = data.map(idea => {
+              if (!idea.ownerEmail) {
+                // Assign legacy entries to a default owner
+                return { ...idea, ownerEmail: 'legacy@cloudflare.com' }
+              }
+              return idea
+            })
+            setIdeas(migratedIdeas)
+            
+            // Save migrated data if any changes were made
+            const hasLegacy = data.some(idea => !idea.ownerEmail)
+            if (hasLegacy) {
+              localStorage.setItem('ideas', JSON.stringify(migratedIdeas))
+            }
           }
-        })
-        .catch(err => console.error('Error loading ideas:', err))
+        } catch (err) {
+          console.error('Error loading ideas from localStorage:', err)
+        }
+      }
     }
   }, [isAuthenticated])
 
   const handleDelete = (id) => {
     const updatedIdeas = ideas.filter((idea) => idea.id !== id)
     setIdeas(updatedIdeas)
-    fetch('/api/ideas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedIdeas)
-    }).catch(err => console.error('Error saving:', err))
+    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
   }
 
   const handleCreateTicket = (id) => {
@@ -156,11 +169,7 @@ function ManagePage({ onBack }) {
       idea.id === id ? { ...idea, status: 'ticket', ticketUrl: ticketUrl || '' } : idea
     )
     setIdeas(updatedIdeas)
-    fetch('/api/ideas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedIdeas)
-    }).catch(err => console.error('Error saving:', err))
+    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
   }
 
   const handleEdit = (id) => {
@@ -187,11 +196,7 @@ function ManagePage({ onBack }) {
       idea.id === editingId ? { ...idea, ...formData } : idea
     )
     setIdeas(updatedIdeas)
-    fetch('/api/ideas', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(updatedIdeas)
-    }).catch(err => console.error('Error saving:', err))
+    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
     setEditingId(null)
     setFormData({
       title: '',
@@ -420,13 +425,16 @@ function ManagePage({ onBack }) {
                     <h3 className="text-xl font-semibold text-gray-800 mb-2">
                       {idea.title}
                     </h3>
-                    <div className="flex items-center gap-4 text-sm">
+                    <div className="flex items-center gap-4 text-sm flex-wrap">
                       <span className="text-gray-600">
                         <span className="font-medium">Submitted by:</span>{' '}
                         <span className="font-semibold">{getDisplayName(idea)}</span>
                       </span>
                       <span className="text-gray-500">
                         {idea.votes || 0} votes
+                      </span>
+                      <span className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded">
+                        Owner: {idea.ownerEmail || 'Unknown'}
                       </span>
                       {idea.status === 'ticket' && (
                         <span className="flex items-center gap-2">

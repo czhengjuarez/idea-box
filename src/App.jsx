@@ -77,7 +77,7 @@ function getDisplayName(idea, isAdmin = false) {
 }
 
 // Sortable Idea Card Component
-function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted }) {
+function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted, currentUserEmail }) {
   const {
     attributes,
     listeners,
@@ -193,21 +193,29 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted }) {
       </div>
 
       {/* Buttons at bottom */}
-      <div className="flex gap-2 px-6 pb-6 pt-3 border-t border-gray-100 flex-wrap">
-        <button
-          onClick={() => onEdit(idea.id)}
-          className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
-        >
-          <Pencil size={16} />
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(idea.id)}
-          className="flex items-center gap-1 px-3 py-1.5 bg-[#E81403] text-white rounded hover:bg-[#c01002] transition-colors text-sm"
-        >
-          <Trash2 size={16} />
-          Delete
-        </button>
+      <div className="flex gap-2 px-6 pb-6 pt-3 border-t border-gray-100 flex-wrap items-center">
+        {idea.ownerEmail === currentUserEmail ? (
+          <>
+            <button
+              onClick={() => onEdit(idea.id)}
+              className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
+            >
+              <Pencil size={16} />
+              Edit
+            </button>
+            <button
+              onClick={() => onDelete(idea.id)}
+              className="flex items-center gap-1 px-3 py-1.5 bg-[#E81403] text-white rounded hover:bg-[#c01002] transition-colors text-sm"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+          </>
+        ) : (
+          <span className="text-xs text-gray-500 italic">
+            You can only edit/delete your own ideas. Use Manage page for admin access.
+          </span>
+        )}
       </div>
     </div>
   )
@@ -252,43 +260,56 @@ function App() {
   // Reload ideas when returning from manage page
   useEffect(() => {
     if (currentPage === 'main') {
-      fetch('/api/ideas')
-        .then(res => res.json())
-        .then(data => {
-          if (data && Array.isArray(data)) {
+      // Load from localStorage
+      const stored = localStorage.getItem('ideas')
+      if (stored) {
+        try {
+          const data = JSON.parse(stored)
+          if (Array.isArray(data)) {
             setIdeas(data)
           }
-        })
-        .catch(err => console.error('Error reloading ideas:', err))
+        } catch (err) {
+          console.error('Error loading ideas from localStorage:', err)
+        }
+      }
     }
   }, [currentPage])
 
-  // Load ideas from R2 API on mount
+  // Load ideas from localStorage on mount and migrate legacy entries
   useEffect(() => {
-    fetch('/api/ideas')
-      .then(res => res.json())
-      .then(data => {
-        if (data && Array.isArray(data)) {
-          setIdeas(data)
+    const stored = localStorage.getItem('ideas')
+    if (stored) {
+      try {
+        const data = JSON.parse(stored)
+        if (Array.isArray(data)) {
+          // Migrate legacy entries without ownerEmail
+          const migratedIdeas = data.map(idea => {
+            if (!idea.ownerEmail) {
+              // Assign legacy entries to a default owner
+              return { ...idea, ownerEmail: 'legacy@cloudflare.com' }
+            }
+            return idea
+          })
+          setIdeas(migratedIdeas)
+          
+          // Save migrated data if any changes were made
+          const hasLegacy = data.some(idea => !idea.ownerEmail)
+          if (hasLegacy) {
+            localStorage.setItem('ideas', JSON.stringify(migratedIdeas))
+          }
         }
-        setIsLoaded(true)
-      })
-      .catch(err => {
-        console.error('Error loading ideas:', err)
-        setIsLoaded(true)
-      })
+      } catch (err) {
+        console.error('Error loading ideas from localStorage:', err)
+      }
+    }
+    setIsLoaded(true)
   }, [])
 
-  // Save ideas to R2 API whenever they change (but not on initial load)
+  // Save ideas to localStorage whenever they change (but not on initial load)
   useEffect(() => {
     if (isLoaded) {
-      fetch('/api/ideas', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(ideas)
-      })
-      .then(() => console.log('Ideas saved to R2'))
-      .catch(err => console.error('Error saving ideas:', err))
+      localStorage.setItem('ideas', JSON.stringify(ideas))
+      console.log('Ideas saved to localStorage')
     }
   }, [ideas, isLoaded])
 
@@ -307,19 +328,26 @@ function App() {
   const handleSubmit = (e) => {
     e.preventDefault()
     if (editingId) {
-      // Update existing idea
-      setIdeas(ideas.map((idea) => 
-        idea.id === editingId ? { ...idea, ...formData } : idea
-      ))
-      setEditingId(null)
+      // Update existing idea (only if user owns it)
+      const ideaToEdit = ideas.find(idea => idea.id === editingId)
+      if (ideaToEdit && ideaToEdit.ownerEmail === user.email) {
+        setIdeas(ideas.map((idea) => 
+          idea.id === editingId ? { ...idea, ...formData } : idea
+        ))
+        setEditingId(null)
+      } else {
+        alert('You can only edit your own ideas.')
+        return
+      }
     } else {
-      // Create new idea
+      // Create new idea with ownership
       const newIdea = {
         id: Date.now().toString(),
         ...formData,
         status: 'pending',
         votes: 0,
         createdAt: new Date().toISOString(),
+        ownerEmail: user.email, // Track who created this idea
       }
       setIdeas([...ideas, newIdea])
     }
@@ -335,12 +363,24 @@ function App() {
   }
 
   const handleDelete = (id) => {
-    setIdeas(ideas.filter((idea) => idea.id !== id))
+    const ideaToDelete = ideas.find(idea => idea.id === id)
+    if (ideaToDelete && ideaToDelete.ownerEmail === user.email) {
+      if (window.confirm('Are you sure you want to delete this idea?')) {
+        setIdeas(ideas.filter((idea) => idea.id !== id))
+      }
+    } else {
+      alert('You can only delete your own ideas.')
+    }
   }
 
   const handleEdit = (id) => {
     const ideaToEdit = ideas.find((idea) => idea.id === id)
     if (ideaToEdit) {
+      // Check ownership
+      if (ideaToEdit.ownerEmail !== user.email) {
+        alert('You can only edit your own ideas. Use the Manage page for admin access.')
+        return
+      }
       setFormData({
         title: ideaToEdit.title,
         submittedBy: ideaToEdit.submittedBy,
@@ -672,6 +712,7 @@ function App() {
                       onEdit={handleEdit}
                       onVote={handleVote}
                       hasVoted={votedIdeas.includes(idea.id)}
+                      currentUserEmail={user.email}
                     />
                   ))}
                 </SortableContext>
