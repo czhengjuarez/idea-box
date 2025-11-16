@@ -24,7 +24,9 @@ jobs:
 
       - name: Create google-auth-config.js
         run: |
-          echo "export const GOOGLE_CLIENT_ID = '${{ secrets.GOOGLE_CLIENT_ID }}'" > google-auth-config.js
+          cat > google-auth-config.js << 'EOF'
+          export const GOOGLE_CLIENT_ID = '${{ secrets.GOOGLE_CLIENT_ID }}'
+          EOF
 
       - name: Build
         run: npm run build
