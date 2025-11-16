@@ -3,12 +3,12 @@
 // Examples: 'gmail.com', 'yourcompany.com', 'example.org'
 
 export const ALLOWED_EMAIL_DOMAINS = [
-  'cloudflare.com',
+  // No restrictions for coscient instance - allow all domains
 ]
 
 // Set to true to allow any email domain (no restrictions)
 // Set to false to enforce domain restrictions
-export const ALLOW_ALL_DOMAINS = false
+export const ALLOW_ALL_DOMAINS = true  // Open to all Google accounts
 
 // Helper function to check if an email is allowed
 export function isEmailAllowed(email) {
