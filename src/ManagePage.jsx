@@ -126,12 +126,11 @@ function ManagePage({ onBack }) {
 
   useEffect(() => {
     if (isAuthenticated) {
-      // Load ideas from localStorage and migrate legacy entries
-      const stored = localStorage.getItem('ideas')
-      if (stored) {
-        try {
-          const data = JSON.parse(stored)
-          if (Array.isArray(data)) {
+      // Load ideas from R2 API and migrate legacy entries
+      fetch('/api/ideas')
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data)) {
             // Migrate legacy entries without ownerEmail
             const migratedIdeas = data.map(idea => {
               if (!idea.ownerEmail) {
@@ -145,20 +144,26 @@ function ManagePage({ onBack }) {
             // Save migrated data if any changes were made
             const hasLegacy = data.some(idea => !idea.ownerEmail)
             if (hasLegacy) {
-              localStorage.setItem('ideas', JSON.stringify(migratedIdeas))
+              fetch('/api/ideas', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(migratedIdeas)
+              }).catch(err => console.error('Error migrating legacy entries:', err))
             }
           }
-        } catch (err) {
-          console.error('Error loading ideas from localStorage:', err)
-        }
-      }
+        })
+        .catch(err => console.error('Error loading ideas:', err))
     }
   }, [isAuthenticated])
 
   const handleDelete = (id) => {
     const updatedIdeas = ideas.filter((idea) => idea.id !== id)
     setIdeas(updatedIdeas)
-    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
+    fetch('/api/ideas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedIdeas)
+    }).catch(err => console.error('Error saving:', err))
   }
 
   const handleCreateTicket = (id) => {
@@ -169,7 +174,11 @@ function ManagePage({ onBack }) {
       idea.id === id ? { ...idea, status: 'ticket', ticketUrl: ticketUrl || '' } : idea
     )
     setIdeas(updatedIdeas)
-    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
+    fetch('/api/ideas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedIdeas)
+    }).catch(err => console.error('Error saving:', err))
   }
 
   const handleEdit = (id) => {
@@ -196,7 +205,11 @@ function ManagePage({ onBack }) {
       idea.id === editingId ? { ...idea, ...formData } : idea
     )
     setIdeas(updatedIdeas)
-    localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
+    fetch('/api/ideas', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updatedIdeas)
+    }).catch(err => console.error('Error saving:', err))
     setEditingId(null)
     setFormData({
       title: '',

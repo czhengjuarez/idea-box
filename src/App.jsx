@@ -260,28 +260,23 @@ function App() {
   // Reload ideas when returning from manage page
   useEffect(() => {
     if (currentPage === 'main') {
-      // Load from localStorage
-      const stored = localStorage.getItem('ideas')
-      if (stored) {
-        try {
-          const data = JSON.parse(stored)
-          if (Array.isArray(data)) {
+      fetch('/api/ideas')
+        .then(res => res.json())
+        .then(data => {
+          if (data && Array.isArray(data)) {
             setIdeas(data)
           }
-        } catch (err) {
-          console.error('Error loading ideas from localStorage:', err)
-        }
-      }
+        })
+        .catch(err => console.error('Error reloading ideas:', err))
     }
   }, [currentPage])
 
-  // Load ideas from localStorage on mount and migrate legacy entries
+  // Load ideas from R2 API on mount and migrate legacy entries
   useEffect(() => {
-    const stored = localStorage.getItem('ideas')
-    if (stored) {
-      try {
-        const data = JSON.parse(stored)
-        if (Array.isArray(data)) {
+    fetch('/api/ideas')
+      .then(res => res.json())
+      .then(data => {
+        if (data && Array.isArray(data)) {
           // Migrate legacy entries without ownerEmail
           const migratedIdeas = data.map(idea => {
             if (!idea.ownerEmail) {
@@ -295,21 +290,31 @@ function App() {
           // Save migrated data if any changes were made
           const hasLegacy = data.some(idea => !idea.ownerEmail)
           if (hasLegacy) {
-            localStorage.setItem('ideas', JSON.stringify(migratedIdeas))
+            fetch('/api/ideas', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(migratedIdeas)
+            }).catch(err => console.error('Error migrating legacy entries:', err))
           }
         }
-      } catch (err) {
-        console.error('Error loading ideas from localStorage:', err)
-      }
-    }
-    setIsLoaded(true)
+        setIsLoaded(true)
+      })
+      .catch(err => {
+        console.error('Error loading ideas:', err)
+        setIsLoaded(true)
+      })
   }, [])
 
-  // Save ideas to localStorage whenever they change (but not on initial load)
+  // Save ideas to R2 API whenever they change (but not on initial load)
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('ideas', JSON.stringify(ideas))
-      console.log('Ideas saved to localStorage')
+      fetch('/api/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(ideas)
+      })
+      .then(() => console.log('Ideas saved to R2'))
+      .catch(err => console.error('Error saving ideas:', err))
     }
   }, [ideas, isLoaded])
 
