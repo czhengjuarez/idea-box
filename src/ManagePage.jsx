@@ -162,14 +162,14 @@ function ManagePage({ onBack }) {
   }
 
   const handleCreateTicket = (id) => {
-    const ticketUrl = prompt('Enter the ticket URL (e.g., Jira link):')
-    if (ticketUrl === null) return // User cancelled
-    
+    // Mark as ticket and open edit form to add ticket URL
     const updatedIdeas = ideas.map((idea) =>
-      idea.id === id ? { ...idea, status: 'ticket', ticketUrl: ticketUrl || '' } : idea
+      idea.id === id ? { ...idea, status: 'ticket', ticketUrl: '' } : idea
     )
     setIdeas(updatedIdeas)
     localStorage.setItem('ideas', JSON.stringify(updatedIdeas))
+    // Open edit form to add ticket URL
+    handleEdit(id)
   }
 
   const handleEdit = (id) => {
@@ -360,6 +360,21 @@ function ManagePage({ onBack }) {
                 />
               </div>
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Status
+                </label>
+                <select
+                  name="status"
+                  value={formData.status || ''}
+                  onChange={handleInputChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="">Suggestion</option>
+                  <option value="ticket">Tracked (Ticket Created)</option>
+                </select>
+              </div>
+
               {formData.status === 'ticket' && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -371,7 +386,7 @@ function ManagePage({ onBack }) {
                     value={formData.ticketUrl}
                     onChange={handleInputChange}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="https://jira.example.com/browse/TICKET-123"
+                    placeholder="https://jira.cfdata.org/browse/DES-12825"
                   />
                 </div>
               )}
