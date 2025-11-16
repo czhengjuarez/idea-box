@@ -3,7 +3,9 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp, Settings } from 'lucide-react'
+import { GripVertical, Trash2, CheckCircle, Plus, X, Pencil, ThumbsUp, Settings, LogOut } from 'lucide-react'
+import { useAuth } from './AuthContext'
+import LoginPage from './LoginPage'
 import ManagePage from './ManagePage'
 import RichTextEditor from './RichTextEditor'
 
@@ -212,6 +214,7 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted }) {
 }
 
 function App() {
+  const { user, logout, isLoading } = useAuth()
   const [currentPage, setCurrentPage] = useState('main') // 'main' or 'manage'
   const [ideas, setIdeas] = useState([])
   const [showForm, setShowForm] = useState(false)
@@ -378,6 +381,29 @@ function App() {
     setFormData({ ...formData, [name]: value })
   }
 
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+      logout()
+    }
+  }
+
+  // Show loading state while checking authentication
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <LightbulbIcon size={64} className="mx-auto text-[#2C1EA9] mb-4 animate-pulse" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Show login page if not authenticated
+  if (!user) {
+    return <LoginPage />
+  }
+
   // Route to manage page if selected
   if (currentPage === 'manage') {
     return <ManagePage onBack={() => setCurrentPage('main')} />
@@ -397,14 +423,35 @@ function App() {
             Drag to prioritize and create tickets for top ideas.
           </p>
           
-          {/* Manage Button */}
-          <button
-            onClick={() => setCurrentPage('manage')}
-            className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
-          >
-            <Settings size={16} />
-            Manage Submissions
-          </button>
+          {/* User Profile and Actions */}
+          <div className="mt-4 flex items-center justify-center gap-4">
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-md">
+              {user.picture && (
+                <img 
+                  src={user.picture} 
+                  alt={user.name} 
+                  className="w-8 h-8 rounded-full"
+                />
+              )}
+              <span className="text-sm text-gray-700 font-medium">{user.name}</span>
+            </div>
+            
+            <button
+              onClick={() => setCurrentPage('manage')}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-md transition-colors"
+            >
+              <Settings size={16} />
+              Manage Submissions
+            </button>
+            
+            <button
+              onClick={handleLogout}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
+            >
+              <LogOut size={16} />
+              Logout
+            </button>
+          </div>
         </div>
 
         {/* Add Idea Button */}

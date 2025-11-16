@@ -17,6 +17,7 @@ dist-ssr
 .env.local
 .env.*.local
 .dev.vars
+google-auth-config.js
 
 # Editor directories and files
 .vscode/*
