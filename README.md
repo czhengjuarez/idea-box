@@ -77,7 +77,71 @@ The built files will be in the `dist` directory.
 
 This app is deployed on **Cloudflare Workers** with **R2 storage** for persistent data.
 
-### Setup Credentials
+### 🚀 Automatic Deployment (Recommended)
+
+**GitHub Actions automatically deploys your app when you push to GitHub!**
+
+This project has two instances with auto-deployment:
+- **`main` branch** → Deploys to px-tester (Cloudflare internal, @cloudflare.com only)
+- **`coscient-prod` branch** → Deploys to coscient (Public, any Google account)
+
+#### How It Works
+
+Every time you push to GitHub:
+```bash
+# Update internal version
+git checkout main
+git add .
+git commit -m "Update feature"
+git push origin main
+# ✅ Auto-deploys to https://idea-box.px-tester.workers.dev
+
+# Update public version
+git checkout coscient-prod
+git add .
+git commit -m "Update feature"
+git push origin coscient-prod
+# ✅ Auto-deploys to https://idea-box.coscient.workers.dev
+```
+
+#### Setup Auto-Deployment
+
+1. **Add GitHub Secrets** (one-time setup):
+   - Go to: `https://github.com/YOUR_USERNAME/idea-box/settings/secrets/actions`
+   - Add these 5 secrets:
+     - `GOOGLE_CLIENT_ID` - Your Google OAuth Client ID
+     - `PX_TESTER_CLOUDFLARE_API_TOKEN` - API token for px-tester account
+     - `PX_TESTER_CLOUDFLARE_ACCOUNT_ID` - Account ID for px-tester
+     - `COSCIENT_CLOUDFLARE_API_TOKEN` - API token for coscient account
+     - `COSCIENT_CLOUDFLARE_ACCOUNT_ID` - Account ID for coscient
+
+2. **That's it!** Push to deploy automatically.
+
+For detailed setup instructions, see [GITHUB_ACTIONS_SETUP.md](./GITHUB_ACTIONS_SETUP.md).
+
+#### Disable Auto-Deployment
+
+If you want to deploy manually instead:
+
+1. **Delete or disable the workflow files**:
+   ```bash
+   # Option 1: Delete workflows (can restore from git history)
+   rm .github/workflows/deploy-px-tester.yml
+   rm .github/workflows/deploy-coscient.yml
+   git commit -m "Disable auto-deployment"
+   git push
+   
+   # Option 2: Disable in GitHub UI
+   # Go to: Actions → Select workflow → "..." menu → Disable workflow
+   ```
+
+2. **Use manual deployment** (see below)
+
+### 📦 Manual Deployment
+
+If you prefer to deploy manually:
+
+#### Setup Credentials
 
 1. Copy the example environment file:
    ```bash
@@ -97,15 +161,15 @@ This app is deployed on **Cloudflare Workers** with **R2 storage** for persisten
 
 **Note**: The `.env` file is gitignored and stores your credentials locally. Never commit this file to Git!
 
-### Deploy to Cloudflare
+#### Deploy to Cloudflare
 
 ```bash
-npm run deploy:env
+npm run deploy
 ```
 
 This will build the app and deploy it to Cloudflare Workers with R2 storage.
 
-For detailed deployment instructions, see [DEPLOY.md](./DEPLOY.md).
+For detailed deployment instructions, see [PRODUCTION_DEPLOYMENT.md](./PRODUCTION_DEPLOYMENT.md).
 
 ### R2 Storage Setup
 
