@@ -23,10 +23,11 @@ jobs:
         run: npm ci
 
       - name: Create google-auth-config.js
-        env:
-          CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         run: |
-          echo "export const GOOGLE_CLIENT_ID = '${CLIENT_ID}'" > google-auth-config.js
+          cp google-auth-config.template.js google-auth-config.js
+          sed -i "s/YOUR_CLIENT_ID_HERE/${{ secrets.GOOGLE_CLIENT_ID }}/g" google-auth-config.js
+          echo "Created google-auth-config.js:"
+          cat google-auth-config.js
 
       - name: Build
         run: npm run build
