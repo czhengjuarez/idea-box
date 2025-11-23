@@ -106,11 +106,13 @@ git push origin coscient-prod
 
 #### Setup Auto-Deployment
 
-1. **Add Cloudflare API Token** (for coscient-prod branch):
-   - The API token is stored in **Cloudflare Pages Environment Variables**, not GitHub Secrets
+1. **Add Cloudflare Environment Variables** (for automatic deployment):
    - Go to: Cloudflare Dashboard → Workers & Pages → idea-box → Settings → Environment variables
-   - Add variable: `CLOUDFLARE_API_TOKEN` with your active Cloudflare API token
-   - This allows Cloudflare Pages to authenticate during automatic builds from GitHub
+   - Add these 3 variables (for Production and Preview environments):
+     - `CLOUDFLARE_API_TOKEN` - Your Cloudflare API token
+     - `CLOUDFLARE_ACCOUNT_ID` - Your Cloudflare Account ID
+     - `GOOGLE_CLIENT_ID` - Your Google OAuth Client ID
+   - This allows Cloudflare Pages to authenticate and build automatically from GitHub
 
 2. **Add GitHub Secrets** (for px-tester branch - one-time setup):
    - Go to: `https://github.com/YOUR_USERNAME/idea-box/settings/secrets/actions`
