@@ -471,13 +471,23 @@ function App() {
           {/* User Profile and Actions */}
           <div className="mt-4 flex items-center justify-center gap-4">
             <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-md">
-              {user.picture && (
+              {user.picture ? (
                 <img 
                   src={user.picture} 
                   alt={user.name} 
                   className="w-8 h-8 rounded-full"
+                  onError={(e) => {
+                    e.target.style.display = 'none'
+                    e.target.nextSibling.style.display = 'flex'
+                  }}
                 />
-              )}
+              ) : null}
+              <div 
+                className="w-8 h-8 rounded-full bg-[#8f1f57] text-white flex items-center justify-center text-xs font-semibold"
+                style={{ display: user.picture ? 'none' : 'flex' }}
+              >
+                {user.name?.charAt(0)?.toUpperCase() || 'U'}
+              </div>
               <span className="text-sm text-gray-700 font-medium">{user.name}</span>
             </div>
             
