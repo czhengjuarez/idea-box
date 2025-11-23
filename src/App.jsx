@@ -127,12 +127,12 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted, currentUse
             onClick={() => onVote(idea.id)}
             className={`flex items-center gap-1.5 px-2.5 py-1 rounded border transition-colors ${
               hasVoted
-                ? 'border-blue-500 bg-blue-50 text-blue-600'
-                : 'border-gray-300 hover:border-blue-500 hover:bg-blue-50'
+                ? 'border-[#8f1f57] bg-[#f5e6ed] text-[#8f1f57]'
+                : 'border-gray-300 hover:border-[#8f1f57] hover:bg-[#f5e6ed]'
             }`}
           >
-            <ThumbsUp size={16} className={hasVoted ? 'text-blue-600 fill-blue-600' : 'text-gray-600'} />
-            <span className={`text-sm font-medium ${hasVoted ? 'text-blue-600' : 'text-gray-700'}`}>{idea.votes || 0}</span>
+            <ThumbsUp size={16} className={hasVoted ? 'text-[#8f1f57] fill-[#8f1f57]' : 'text-gray-600'} />
+            <span className={`text-sm font-medium ${hasVoted ? 'text-[#8f1f57]' : 'text-gray-700'}`}>{idea.votes || 0}</span>
           </button>
         </div>
         
@@ -147,7 +147,7 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted, currentUse
                 href={idea.ticketUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 underline text-sm"
+                className="text-[#8f1f57] hover:text-[#7a1a4a] underline text-sm"
               >
                 View Ticket
               </a>
@@ -198,7 +198,7 @@ function SortableIdeaCard({ idea, onDelete, onEdit, onVote, hasVoted, currentUse
           <>
             <button
               onClick={() => onEdit(idea.id)}
-              className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
+              className="flex items-center gap-1 px-3 py-1.5 bg-[#8f1f57] text-white rounded hover:bg-[#7a1a4a] transition-colors text-sm"
             >
               <Pencil size={16} />
               Edit
@@ -503,7 +503,7 @@ function App() {
         {!showForm && (
           <button
             onClick={() => setShowForm(true)}
-            className="w-full mb-6 flex items-center justify-center gap-2 px-6 py-4 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-md font-medium"
+            className="w-full mb-6 flex items-center justify-center gap-2 px-6 py-4 bg-[#8f1f57] text-white rounded-lg hover:bg-[#7a1a4a] transition-colors shadow-md font-medium"
           >
             <Plus size={20} />
             Submit New Idea
@@ -545,7 +545,7 @@ function App() {
                   value={formData.title}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                   placeholder="Brief title for your idea"
                 />
               </div>
@@ -559,7 +559,7 @@ function App() {
                   name="submittedBy"
                   value={formData.submittedBy}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                   placeholder="Your name (optional)"
                 />
                 
@@ -575,7 +575,7 @@ function App() {
                         value="everyone"
                         checked={formData.nameVisibility === 'everyone'}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 text-[#8f1f57] focus:ring-2 focus:ring-[#8f1f57]"
                       />
                       <span className="text-sm text-gray-700">Everyone</span>
                     </label>
@@ -586,7 +586,7 @@ function App() {
                         value="pxlt"
                         checked={formData.nameVisibility === 'pxlt'}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 text-[#8f1f57] focus:ring-2 focus:ring-[#8f1f57]"
                       />
                       <span className="text-sm text-gray-700">PXLT only</span>
                     </label>
@@ -633,7 +633,7 @@ function App() {
               <div className="flex gap-3">
                 <button
                   type="submit"
-                  className="flex-1 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+                  className="flex-1 px-6 py-2 bg-[#8f1f57] text-white rounded-md hover:bg-[#7a1a4a] transition-colors font-medium"
                 >
                   Submit Idea
                 </button>
@@ -662,7 +662,7 @@ function App() {
             >
               Suggestions
               {activeTab === 'suggestions' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8f1f57]"></div>
               )}
             </button>
             <button
@@ -675,7 +675,7 @@ function App() {
             >
               Tracked
               {activeTab === 'tracked' && (
-                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
+                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#8f1f57]"></div>
               )}
             </button>
           </div>

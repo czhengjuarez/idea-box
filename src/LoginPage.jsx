@@ -72,7 +72,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#f5e6ed] to-[#e6d4dc] flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-2xl shadow-xl p-8">
         <div className="text-center">
           {/* Logo and Title */}
@@ -96,8 +96,8 @@ export default function LoginPage() {
           
           {/* Domain Restriction Info */}
           {!ALLOW_ALL_DOMAINS && ALLOWED_EMAIL_DOMAINS.length > 0 && (
-            <div className="mb-6 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-xs text-blue-800">
+            <div className="mb-6 p-3 bg-[#f5e6ed] border border-[#d4a5bb] rounded-lg">
+              <p className="text-xs text-[#7a1a4a]">
                 <strong>Restricted Access:</strong> Only emails from {ALLOWED_EMAIL_DOMAINS.join(', ')} are allowed.
               </p>
             </div>

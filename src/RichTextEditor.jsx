@@ -75,7 +75,7 @@ function RichTextEditor({ value, onChange, placeholder, required }) {
         contentEditable
         onInput={handleInput}
         onBlur={handleInput}
-        className="editor-content min-h-[120px] p-3 border border-t-0 border-gray-300 rounded-b-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+        className="editor-content min-h-[120px] p-3 border border-t-0 border-gray-300 rounded-b-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57] bg-white"
         data-placeholder={placeholder}
         suppressContentEditableWarning
       />

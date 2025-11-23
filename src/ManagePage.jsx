@@ -38,7 +38,7 @@ function LoginForm({ onLogin }) {
     
     // Simple hardcoded credentials for MVP
     // TODO: Replace with proper authentication
-    if (email === 'pxlt@cloudflare.com' && password === 'pxlt2025') {
+    if (email === 'test@test.com' && password === 'test') {
       onLogin()
       setError('')
     } else {
@@ -62,8 +62,8 @@ function LoginForm({ onLogin }) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="pxlt@cloudflare.com"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
+              placeholder="test@test.com"
             />
           </div>
 
@@ -77,7 +77,7 @@ function LoginForm({ onLogin }) {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 placeholder="Enter password"
               />
               <button
@@ -98,7 +98,7 @@ function LoginForm({ onLogin }) {
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors font-medium"
+            className="w-full bg-[#8f1f57] text-white py-2 rounded-md hover:bg-[#7a1a4a] transition-colors font-medium"
           >
             Sign In
           </button>
@@ -242,7 +242,7 @@ function ManagePage({ onBack }) {
         <div className="mb-8">
           <button
             onClick={onBack}
-            className="flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-4"
+            className="flex items-center gap-2 text-[#8f1f57] hover:text-[#7a1a4a] mb-4"
           >
             <ArrowLeft size={20} />
             Back to Public View
@@ -287,7 +287,7 @@ function ManagePage({ onBack }) {
                   value={formData.title}
                   onChange={handleInputChange}
                   required
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 />
               </div>
 
@@ -300,7 +300,7 @@ function ManagePage({ onBack }) {
                   name="submittedBy"
                   value={formData.submittedBy}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 />
                 
                 <div className="mt-3">
@@ -315,7 +315,7 @@ function ManagePage({ onBack }) {
                         value="everyone"
                         checked={formData.nameVisibility === 'everyone'}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 text-[#8f1f57] focus:ring-2 focus:ring-[#8f1f57]"
                       />
                       <span className="text-sm text-gray-700">Everyone</span>
                     </label>
@@ -326,7 +326,7 @@ function ManagePage({ onBack }) {
                         value="pxlt"
                         checked={formData.nameVisibility === 'pxlt'}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                        className="w-4 h-4 text-[#8f1f57] focus:ring-2 focus:ring-[#8f1f57]"
                       />
                       <span className="text-sm text-gray-700">PXLT only</span>
                     </label>
@@ -344,7 +344,7 @@ function ManagePage({ onBack }) {
                   onChange={handleInputChange}
                   required
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 />
               </div>
 
@@ -358,7 +358,7 @@ function ManagePage({ onBack }) {
                   onChange={handleInputChange}
                   required
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 />
               </div>
 
@@ -372,7 +372,7 @@ function ManagePage({ onBack }) {
                   onChange={handleInputChange}
                   required
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 />
               </div>
 
@@ -384,7 +384,7 @@ function ManagePage({ onBack }) {
                   name="status"
                   value={formData.status || ''}
                   onChange={handleInputChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                 >
                   <option value="">Suggestion</option>
                   <option value="ticket">Tracked (Ticket Created)</option>
@@ -401,7 +401,7 @@ function ManagePage({ onBack }) {
                     name="ticketUrl"
                     value={formData.ticketUrl}
                     onChange={handleInputChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#8f1f57]"
                     placeholder="https://jira.cfdata.org/browse/DES-12825"
                   />
                 </div>
@@ -410,7 +410,7 @@ function ManagePage({ onBack }) {
               <div className="flex gap-2">
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors font-medium"
+                  className="px-6 py-2 bg-[#8f1f57] text-white rounded-md hover:bg-[#7a1a4a] transition-colors font-medium"
                 >
                   Save Changes
                 </button>
@@ -478,7 +478,7 @@ function ManagePage({ onBack }) {
                               href={idea.ticketUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 underline text-sm"
+                              className="text-[#8f1f57] hover:text-[#7a1a4a] underline text-sm"
                             >
                               View Ticket
                             </a>
@@ -519,7 +519,7 @@ function ManagePage({ onBack }) {
                         window.open('https://jira.cfdata.org/browse/DES-12825', '_blank', 'noopener,noreferrer')
                         handleCreateTicket(idea.id)
                       }}
-                      className="flex items-center gap-1 px-3 py-1.5 border border-[#0051C3] text-[#0051C3] bg-white rounded hover:bg-blue-50 transition-colors text-sm"
+                      className="flex items-center gap-1 px-3 py-1.5 border border-[#8f1f57] text-[#8f1f57] bg-white rounded hover:bg-[#f5e6ed] transition-colors text-sm"
                     >
                       <CheckCircle size={16} />
                       Create Ticket
@@ -527,7 +527,7 @@ function ManagePage({ onBack }) {
                   )}
                   <button
                     onClick={() => handleEdit(idea.id)}
-                    className="flex items-center gap-1 px-3 py-1.5 bg-[#0051C3] text-white rounded hover:bg-[#003d99] transition-colors text-sm"
+                    className="flex items-center gap-1 px-3 py-1.5 bg-[#8f1f57] text-white rounded hover:bg-[#7a1a4a] transition-colors text-sm"
                   >
                     <Pencil size={16} />
                     Edit
